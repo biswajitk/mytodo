@@ -1,0 +1,31 @@
+{% block body_block %}
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>MyToDo SignUp</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+   
+</head>
+<body>
+  <div django-app="TaskManager">        
+    <div class="container">
+            <div class="content">
+              <p align="middle"><img src="..\static\images\todologo.png"/ height="70px" ></p>
+              <div class="container">
+                <div class="jumbotron">
+                  <h1>Login here :</h1><form method="post" >
+                      {% csrf_token %}
+                      {# A more "HTML" way of creating the login form#}
+                      <label for="username">Username:</label>
+                      <input type="text" name="username" placeholder="Username"><label for="password">Password:</label>
+                      <input type="password" name="password" placeholder="Password"><input type="submit" name="" value="Login"></form></div>
+                      <a href="{% url 'signup' %}">New User? Register here</a>
+                </div>
+              </div>
+            </div>
+    </div>
+</body>
+</html>              
+{% endblock %}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>MyToDo</title>
+  {% load static %}
+  
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+   <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <script src="{% static 'css/style.css' %}"></script> 
+    <script type="text/javascript">
+        function openCity(evt, cityName) {
+            // Declare all variables
+          var i, tabcontent, tablinks;
+
+          // Get all elements with class="tabcontent" and hide them
+          tabcontent = document.getElementsByClassName("tabcontent");
+          for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+          }
+
+          // Get all elements with class="tablinks" and remove the class "active"
+          tablinks = document.getElementsByClassName("tablinks");
+          for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+          }
+
+          // Show the current tab, and add an "active" class to the button that opened the tab
+          document.getElementById(cityName).style.display = "block";
+          evt.currentTarget.className += " active";
+        } 
+
+        function validate(form) { 
+        // Checking if at least one period button is selected. Or not. 
+        var checkboxes=document.getElementsByName("checkedbox_all"); //all should be same
+        
+        var is_checked=false;
+           for(var i=0;i<checkboxes.length;i++)
+           {
+              
+              if(checkboxes[i].checked)
+              {
+                is_checked=true;
+              }
+              
+           }
+           if(is_checked){
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        
+        function populateHiddenField(strTab)
+        {
+            
+            document.getElementById("hdnCheckBox").value=strTab;
+            
+        }
+    </script>
+</head><body onload='document.getElementById("defaultOpen").click()'>
+<table width="100%" bgcolor="#000000"><tr align="right"><td align="right" >
+   {% if user.is_authenticated %}
+            <font size=2 color="ffffff">Hello {{ request.session.userid }} I <a href="../login">Logout</a></font>
+
+</td></tr></table>
+<div django-app="TaskManager">        
+    <div class="container">
+            <div class="content">
+            <p align="middle"><img src="..\static\images\todologo.png"/ height="70px" ></p>
+           
+            <form action="/" method="post" >
+            {% csrf_token %} <!-- csrf token for basic security -->
+                <div class="inputContainer">
+                    <input type="text" id="description" class="taskName" placeholder="What do you need to do?" name="description" required>
+                    <label for="description">Description</label>
+                </div>
+                <div class="inputContainer half last">
+                    <i class="fa fa-caret-down selectArrow"></i>
+                    <select id="category" class="taskCategory" name="category_select">
+                    <option class="disabled" value="">Choose a category</option>
+                    {% for category in categories %}
+                        <option class="" value="{{ category.name }}" name="{{ category.name }}">{{ category.name }}</option>
+                    {% endfor %}
+                    </select>
+                    <label for="category">Category</label>
+                </div>
+                <div class="inputContainer half last right">
+                    <input type="date" id="dueDate" class="taskDate" name="date">
+                    <label for="dueDate">Due Date</label>
+                </div>
+                <div class="row">
+                    <button class="taskAdd" name="taskAdd" type="submit"><i class="fa fa-plus icon"></i>Add task</button>
+                    <button class="taskCompleted" name="taskCompleted" formnovalidate="" type="submit" onclick="$('input#sublist').click();"><i class="fa fa-check icon"></i>Complete task</button>
+                    <button class="taskDelete" name="taskDelete" formnovalidate="" type="submit" onclick="$('input#sublist').click();"><i class="fa fa-trash-o icon"></i>Delete Tasks</button>
+                </div> 
+                <!-- Tab links -->
+                <div class="tab">
+                  <button class="tablinks" onclick="openCity(event, 'All')" id="defaultOpen">All</button>
+                  <button class="tablinks" onclick="openCity(event, 'Today')">Today</button>
+                  <button class="tablinks" onclick="openCity(event, 'Tomorrow')">Tomorrow</button>
+                  <button class="tablinks" onclick="openCity(event, 'Completed')">Completed</button>
+                </div>
+                <!-- Tab content -->
+                
+
+                
+
+                
+                <div id="All" class="tabcontent">
+                           <ul class="taskList">
+                {% for todo in todos %} <!-- django template lang - for loop -->
+                    <li class="taskItem">
+                        <input type="checkbox" class="taskCheckbox" name="checkedbox_all" id="{{ todo.id }}" value="{{ todo.id }}" onclick="populateHiddenField('All');">
+                        <label for="{{ todo.id }}"><span class="complete-">{{ todo.title }}</span></label>
+                        <span class="category-{{ todo.category }}">{{ todo.category }}</span>
+                       
+                        <strong class="taskDate"><i class="fa fa-calendar"></i>{% if todo.due_date == todo.todays_date %}<font color='red'>Today </font>
+                            {%elif todo.due_date == todo.tomorrows_date %}Tomorrow {%else%} {{todo.due_date}} {%endif %}
+                        
+                        </strong>
+                    </li>
+                {% endfor %}            </ul><!-- taskList -->
+            </div>
+            
+            <div id="Today" class="tabcontent">
+                  <ul class="taskList">
+                {% for todo in todos_today %} <!-- django template lang - for loop -->
+                    <li class="taskItem">
+                        <input type="checkbox" class="taskCheckbox" name="checkedbox_today" id="{{ todo.id }}" value="{{ todo.id }}" onclick="populateHiddenField('Today');">
+                        <label for="{{ todo.id }}"><span class="complete-">{{ todo.title }}</span></label>
+                        <span class="category-{{ todo.category }}">{{ todo.category }}</span>
+                       
+                        <strong class="taskDate"><i class="fa fa-calendar"></i>{% if todo.due_date == todo.todays_date %}Today 
+                            {%elif todo.due_date == todo.tomorrows_date %}Tomorrow {%else%} {{todo.due_date}} {%endif %}
+                        
+                        </strong>
+                    </li>
+                {% endfor %}            </ul><!-- taskList -->
+            </div>
+            <div id="Tomorrow" class="tabcontent">
+                  <ul class="taskList">
+                {% for todo in todos_tomorrow %} <!-- django template lang - for loop -->
+                    <li class="taskItem">
+                        <input type="checkbox" class="taskCheckbox" name="checkedbox_tomorrow" id="{{ todo.id }}" value="{{ todo.id }}" onclick="populateHiddenField('Tomorrow');">
+                        <label for="{{ todo.id }}"><span class="complete-">{{ todo.title }}</span></label>
+                        <span class="category-{{ todo.category }}">{{ todo.category }}</span>
+                       
+                        <strong class="taskDate"><i class="fa fa-calendar"></i>{% if todo.due_date == todo.todays_date %}Today 
+                            {%elif todo.due_date == todo.tomorrows_date %}Tomorrow {%else%} {{todo.due_date}} {%endif %}
+                        
+                        </strong>
+                    </li>
+                {% endfor %}            </ul><!-- taskList -->
+                </div>    
+            
+            </div>
+            <div id="Completed" class="tabcontent">
+                  <ul class="taskList">
+                {% for todo in todos_completed %} <!-- django template lang - for loop -->
+                    <li class="taskItem">
+                        <input type="checkbox" class="taskCheckbox" name="checkedbox_completed" id="{{ todo.id }}" value="{{ todo.id }}" onclick="populateHiddenField('Completed');">
+                        <label for="{{ todo.id }}"><span class="complete-">{{ todo.title }}</span></label>
+                        <span class="category-{{ todo.category }}">{{ todo.category }}</span>
+                       
+                        <strong class="taskDate"><i class="fa fa-calendar"></i>{% if todo.due_date == todo.todays_date %}Today 
+                            {%elif todo.due_date == todo.tomorrows_date %}Tomorrow {%else%} {{todo.due_date}} {%endif %}
+                        
+                        </strong>
+                    </li>
+                {% endfor %}            </ul><!-- taskList -->
+                </div>  
+                <input type="hidden" id="hdnCheckBox" name="hdnCheckBox" >
+            </form>
+            {% else %}
+              <a href="{% url 'login' %}">Existing User? Login here</a>
+            {% endif %}
+            </div>
+
+
+
+            <!-- content --> </div><!-- container -->
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</body>
+</html>

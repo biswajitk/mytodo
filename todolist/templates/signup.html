@@ -1,0 +1,41 @@
+
+{% block content %}
+<!DOCTYPE html>
+<html >
+<head>
+  <meta charset="UTF-8">
+  <title>MyToDo SignUp</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+  <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+   
+</head>
+<body>
+  <div django-app="TaskManager">        
+    <div class="container">
+            <div class="content">
+              <p align="middle"><img src="..\static\images\todologo.png"/ height="70px" ></p>
+              <form method="post">
+                <div class="jumbotron">
+                {% csrf_token %}
+                {% for field in form %}
+                  <p>
+                    {{ field.label_tag }}<br>
+                    {{ field }}
+                    {% if field.help_text %}
+                      <small style="color: black">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                      <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                  </p>
+                {% endfor %}
+                <button type="submit">Sign up</button>
+              </div>
+                <a href="{% url 'login' %}">Existing User? Login here</a>
+              </form>
+            </div>
+    </div>
+  </div>
+</body>    
+
+{% endblock %}
